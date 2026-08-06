@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+{% for post in posts %}
+<article class="post">
+  <header>
+    <div class="title">
+      <h2><a href="/blog/{{ post.permalink }}">{{ post.title }}</a></h2>
+      <p>{{ post.subtitle }}</p>
+    </div>
+  </header>
+  <a href="/blog/{{ post.permalink }}" class="image featured">
+    <img src="/static/assets/blog-images/{{ post.image }}" alt="" />
+  </a>
+  <p>{{ post.shortcontent }}</p>
+  <footer>
+    <ul class="read-more">
+      <li><a href="/blog/{{ post.permalink }}" class="button large">Continue Reading</a></li>
+    </ul>
+    <ul class="stats">
+      <li><span>{{ post.date }}</span></li>
+    </ul>
+  </footer>
+</article>
+{% endfor %}
+{% endblock %}

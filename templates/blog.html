@@ -1,0 +1,43 @@
+{% extends 'blog-layout.html' %}
+
+{% block body %}
+
+{% for post in posts %}
+<!-- Post -->
+<article class="post">
+	<header>
+		<div class="title">
+			<h2><a href="/blog/{{ post.permalink }}">{{ post.title }}</a></h2>
+			<p>{{ post.subtitle }}</p>
+		</div>
+		<div class="meta">
+			<time class="published" datetime="2015-11-01">{{ post.date }}</time>
+			<span href="#" class="author"><span class="name">{{ post.author }}</span><img
+					src="/static/assets/blog-images/{{ post.author_image }}" alt="" /></span>
+		</div>
+	</header>
+	<a href="/blog/{{ post.permalink }}" class="image featured"><img src="/static/assets/blog-images/{{ post.image }}"
+			alt="" /></a>
+	<p>{{ post.shortcontent }}</p>
+	<footer>
+		<ul class="read-more">
+			<li><a href="/blog/{{ post.permalink }}" class="button large">Continue Reading</a></li>
+		</ul>
+		<ul class="stats">
+			<li><span>{{ post.tags }}</span></li>
+		</ul>
+	</footer>
+</article>
+
+<!-- Pagination -->
+<ul class="pagination">
+	{% if previous_page >= 0 %}
+	<li><a href="/blog/page/{{ previous_page }}" class="disabled button large previous">Previous Page</a></li>
+	{% endif %}
+	{% if next_page > 0 %}
+	<li><a href="/blog/page/{{ next_page }}" class="button large next">Next Page</a></li>
+	{% endif %}
+</ul>
+{% endfor %}
+
+{% endblock %}

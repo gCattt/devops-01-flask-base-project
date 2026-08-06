@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Francesco Faenza</title>
+	<link href="/static/styles/main.css" rel="stylesheet">
+</head>
+
+<body class="site-colors site-sizes stories">
+
+	<div id="header">
+		<header>
+			<span class="image avatar"><img src="/static/assets/avatar.jpg" alt="" /></span>
+			<h1 id="logo"><a href="/home">Francesco Faenza</a></h1>
+			<p>PhD Candidate at Lavoro, Sviluppo e Innovazione<br />
+				and Software Engineer</p>
+		</header>
+		<nav id="nav">
+			<ul>
+				<li><a href="/home">Home</a></li>
+				<li><a href="#stories" class="active">Stories' archive</a></li>
+			</ul>
+		</nav>
+		<footer>
+			<ul class="icons">
+				<li><a href="/home#contact" class="icon solid gg-mail big-icon"><span class="label">Email</span></a>
+				</li>
+			</ul>
+		</footer>
+	</div>
+	<!-- Main -->
+	<div id="main">
+		<div class="wrapper">
+			{% block body %}
+			{% endblock %}
+
+		</div>
+	</div>
+	<div id="titlebar">
+		<a href="#header" class="toggle">
+			<i id="icon-menu" class="gg-menu big-icon"></i>
+			<i id="icon-close" class="gg-close big-icon"></i>
+		</a>
+		<span class="title">
+			<a href="#">Francesco Faenza</a>
+		</span>
+	</div>
+
+
+</body>
+
+</html>

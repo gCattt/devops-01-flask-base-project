@@ -1,0 +1,27 @@
+{% extends 'blog-layout.html' %}
+
+{% block body %}
+<article class="post">
+	<header>
+		<div class="title">
+			<h2><a href="/blog/{{ post.permalink }}">{{ post.title }}</a></h2>
+			<p>{{ post.subtitle }}</p>
+		</div>
+		<div class="meta">
+			<time class="published" datetime="2015-11-01">{{ post.date }}</time>
+			<span href="#" class="author"><span class="name">{{ post.author }}</span><img
+					src="/static/assets/blog-images/{{ post.author_image }}" alt="" /></span>
+		</div>
+	</header>
+	<a href="/blog/{{ post.permalink }}" class="image featured"><img src="/static/assets/blog-images/{{ post.image }}"
+			alt="" /></a>
+	<div>
+    {{ post.html|safe }}
+  </div>
+	<footer>
+		<ul class="stats">
+			<li><span>{{ post.tags }}</span></li>
+		</ul>
+	</footer>
+</article>
+{% endblock %}

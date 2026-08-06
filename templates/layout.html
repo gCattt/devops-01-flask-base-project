@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Francesco Faenza</title>
+    <link href="/static/styles/main.css" rel="stylesheet">
+</head>
+<body class="site-colors site-sizes">
+    <div id="header">
+        <header>
+            <span class="image avatar"><img src="/static/assets/avatar.jpg" alt="" /></span>
+            <h1 id="logo"><a href="/home">Francesco Faenza</a></h1>
+            <p>PhD Candidate at Lavoro, Sviluppo e Innovazione<br />
+            and Software Engineer</p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="#about" class="active">About</a></li>
+                <li><a href="#cando">Things I Can Do</a></li>
+                <li><a href="#failures">A Few Failures</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <li><a href="#contact" class="icon solid gg-mail big-icon"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </div>
+
+    <div id="main">
+        <section id="about">
+            <div class="about image">
+                <img class="center-cropped" src="/static/assets/about.jpg" alt="about-image"/>
+            </div>
+            <div class="container">
+                <header class="major">
+                    <h2>About Me</h2>
+                    <p>
+                        Just a couple of stuff about me.
+                    </p>
+
+                </header>
+                <p>
+                    Born in the countryside of Abruzzo (Italy). 
+                </p>
+            </div>
+        </section>
+        <section id="cando">
+            <div class="container">
+                <h3>Things I Can Do</h3>
+                <p>
+                    A list of things I'm experienced enough into. 
+                    Someone would call them competencies or skills, but I prefer to say I'm confident enough to claim
+                    I can do them.<br>
+                    <span class="sidenote">Bonus: next commit, I will make it possible to click elements so that more details will be shown.</span>
+                </p>
+                <ul class="can-do-icons">
+                    <li class="icon solid"><span><i class="gg-code-slash mid-icon"></i></span>Program with Python</li>
+                    <li class="icon solid"><span><i class="gg-terminal mid-icon"></i></span>DevOps stuff</li>
+                    <li class="icon solid"><span><i class="gg-readme mid-icon"></i></span>Read books and stuff</li>
+                    <li class="icon solid"><span><i class="gg-user mid-icon"></i></span>Hold conversations in English</li>
+                    <li class="icon solid"><span><i class="gg-band-aid mid-icon"></i></span>Be a first responder</li>
+                    <li class="icon solid"><span><i class="gg-coffee mid-icon"></i></span>Drink a lot of coffee</li>
+                    <li class="icon solid"><span><i class="gg-film mid-icon"></i></span>Talk hours about Star Wars</li>
+                    <li class="icon solid"><span><i class="gg-comment mid-icon"></i></span>Socialise with people</li>
+                </ul>
+            </div>
+        </section>
+        <section id="failures">
+            <div class="container">
+                <h3>A Few Failures</h3>
+                <p>It is so boring to talk about success, I feel like
+                    patting myself. It's much more interesting to talk
+                    about ourself failures and what they teached us.
+                    So here my inverse curriculum, instead of a list of 
+                    success, here the list of failure that led me to 
+                    what and where I am now.
+                </p>
+                <div class="articles">
+                    {% block body %}
+                    {% endblock %}
+                </div>
+                <ul class="pagination">
+                    <li class="continue-reading">
+                        <a href="/blog">Older Stories</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section id="contact">
+            <div class="container">
+                <h3>Contact Me</h3>
+                <p>Contact section still to be filled. Honestly not sure if placing here a contact form or not, we will see!
+                </p>
+            </div>
+        </section>
+    </div>
+    <div id="titlebar">
+        <a href="#header" class="toggle">
+            <i id="icon-menu" class="gg-menu big-icon"></i>
+            <i id="icon-close" class="gg-close big-icon"></i>
+        </a>
+        <span class="title">
+            <a href="#">Francesco Faenza</a>
+        </span>
+    </div>
+
+    <script src="/static/scripts/main.js"></script>
+    
+</body>
+</html>
+
