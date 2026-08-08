@@ -6,6 +6,10 @@ services:
       dockerfile: Dockerfile
     ports: # host:container
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
 
   db:
     # image is pulled from Docker Hub
@@ -14,8 +18,17 @@ services:
       POSTGRES_USER: flask
       POSTGRES_PASSWORD: passwordhere
       POSTGRES_DB: blog
+    ports:
+      - "5432:5432" # unnecessary but useful for debugging:
+                    # web already has access to the db container through the default bridge network
     volumes:
       - db-data:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flask -d blog"] # test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
 volumes:
   db-data:
