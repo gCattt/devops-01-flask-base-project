@@ -1,0 +1,22 @@
+services:
+  web:
+    # image is built locally from the Dockerfile(s)
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: # host:container
+      - "8080:8080"
+
+  db:
+    # image is pulled from Docker Hub
+    image: postgres:14
+    environment:
+      POSTGRES_USER: flask
+      POSTGRES_PASSWORD: passwordhere
+      POSTGRES_DB: blog
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+
+volumes:
+  db-data:
+    name: flask-postgres-data
