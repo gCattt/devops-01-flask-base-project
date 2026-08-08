@@ -10,6 +10,13 @@ services:
       db:
         condition: service_healthy
         restart: true
+    develop:
+      watch: # rules from .dockerignore apply
+        - action: sync # sync source changes without rebuilding the image
+          path: .
+          target: /usr/src/app
+        - action: rebuild # rebuild image when dependencies change
+          path: requirements.txt
 
   db:
     # image is pulled from Docker Hub
