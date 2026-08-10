@@ -1,7 +1,11 @@
 # syntax=docker/dockerfile:1
 
+###########
+# BUILDER #
+###########
+
 # pull official base image
-FROM python:3.11-slim
+FROM python:3.11-slim AS builder
 
 # set work directory
 WORKDIR /usr/src/app
@@ -13,9 +17,7 @@ ENV FLASK_APP=app.py
 
 # install system dependencies
 # RUN apt-get update \
-#     && apt-get install -y --no-install-recommends \
-#         <package-1> \
-#         <package-2> \
+#     && apt-get install -y --no-install-recommends <packages> \
 #     && apt-get clean \
 #     && rm -rf /var/lib/apt/lists/*
 
@@ -27,8 +29,26 @@ RUN pip install --no-cache-dir -r requirements.txt
 # install app source code into the build container filesystem
 COPY . .
 
+#########
+# FINAL #
+#########
+
+# pull official base image
+FROM python:3.11-slim AS final
+
+# set work directory
+WORKDIR /usr/src/app
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=app.py
+
+# copy installed dependencies and application source code from the builder stage
+COPY --from=builder /usr/local /usr/local
+COPY --from=builder /usr/src/app /usr/src/app
+
 # entrypoint
-COPY ./entrypoint.sh .
 RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh # normalize Windows line endings to Unix line endings
 RUN chmod +x /usr/src/app/entrypoint.sh
 
