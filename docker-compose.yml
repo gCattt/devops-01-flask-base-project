@@ -1,15 +1,20 @@
+x-web-service: &default-web-service
+  depends_on:
+    db:
+      condition: service_healthy
+      restart: true
+  # image is built locally from the Dockerfile(s)
+  build:
+    context: .
+    dockerfile: Dockerfile
+
 services:
-  web:
-    # image is built locally from the Dockerfile(s)
-    build:
-      context: .
-      dockerfile: Dockerfile
+  web-dev:
+    <<: *default-web-service
+    container_name: flask-dev
+    profiles: ["dev"]
     ports: # host:container
       - "8080:8080"
-    depends_on:
-      db:
-        condition: service_healthy
-        restart: true
     develop:
       watch: # rules from .dockerignore apply
         - action: sync # sync source changes without rebuilding the image
@@ -17,15 +22,26 @@ services:
           target: /usr/src/app
         - action: rebuild # rebuild image when dependencies change
           path: requirements.txt
+    command: ["flask", "run", "--host=0.0.0.0", "--port=8080", "--debug"] # overrides CMD from the Dockerfile
+
+  web-prod:
+    <<: *default-web-service
+    container_name: flask-prod
+    profiles: ["prod"]
+    ports: # host:container
+      - "8081:8080"
+    # command: CMD from the Dockerfile is used by default
 
   db:
+    container_name: flask-db
+    profiles: ["dev", "prod"]
     # image is pulled from Docker Hub
     image: postgres:14
     environment:
       POSTGRES_USER: flask
       POSTGRES_PASSWORD: passwordhere
       POSTGRES_DB: blog
-    ports:
+    ports: # host:container
       - "5432:5432" # unnecessary but useful for debugging:
                     # web already has access to the db container through the default bridge network
     volumes:
