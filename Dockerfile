@@ -52,6 +52,16 @@ COPY --from=builder /usr/src/app /usr/src/app
 RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh # normalize Windows line endings to Unix line endings
 RUN chmod +x /usr/src/app/entrypoint.sh
 
+# create non-root app user (best practice for security reasons)
+RUN addgroup --system app && adduser --system --ingroup app app
+
+# chown all the files to the app user
+# otherwise, the app user will not have permission to write to the app directory and will fail to start
+RUN chown -R app:app /usr/src/app
+
+# change to the app user
+USER app
+
 # final configuration
 EXPOSE 8080
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
