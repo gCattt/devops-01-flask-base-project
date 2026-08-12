@@ -13,6 +13,9 @@ services:
     <<: *default-web-service
     container_name: flask-dev
     profiles: ["dev"]
+    # load environment variables from a file
+    env_file: ".env"
+    # specific environment variables for this service (override the ones from the env_file)
     environment:
       FLASK_DEBUG: "1"
     ports: # host:container
@@ -30,6 +33,8 @@ services:
     <<: *default-web-service
     container_name: flask-prod
     profiles: ["prod"]
+    # load environment variables from a file
+    env_file: ".env"
     ports: # host:container
       - "8081:8080"
     # command: CMD from the Dockerfile is used by default
@@ -39,17 +44,15 @@ services:
     profiles: ["dev", "prod"]
     # image is pulled from Docker Hub
     image: postgres:14
-    environment:
-      POSTGRES_USER: flask
-      POSTGRES_PASSWORD: passwordhere
-      POSTGRES_DB: blog
+    # load environment variables from a file
+    env_file: ".env"
     ports: # host:container
       - "5432:5432" # unnecessary but useful for debugging:
                     # web already has access to the db container through the default bridge network
     volumes:
       - db-data:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U flask -d blog"] # test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 3s
       retries: 5
