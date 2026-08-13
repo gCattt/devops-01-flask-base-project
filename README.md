@@ -34,7 +34,7 @@ the article real content.
 
 Images are optional and optional parameter must not be inserted in the file.
 
-Every image eventually specified must be placed in the folder `static/assets/blog-imaes` and commit altogether.
+Every image eventually specified must be placed in the folder `static/assets/blog-images` and commit altogether.
 
 #### Post views
 To keep track of each post visualisations, a simple table is created in a postgres database using `Flask-SQLAlchemy`.
