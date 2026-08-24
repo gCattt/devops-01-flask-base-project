@@ -1,0 +1,129 @@
+# list of stages for jobs and their order of execution
+stages: 
+  - test
+  - build
+  - deploy
+
+# specify additional configurations that are applied to all jobs
+default:
+  interruptible: true
+
+workflow:
+  name: "strange blog - $CI_PIPELINE_SOURCE - $CI_COMMIT_REF_NAME"
+  rules:
+    # merge request pipelines
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # do not create a duplicate branch pipeline when the branch already has an open merge request
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    # normal branch pushes
+    - if: '$CI_COMMIT_BRANCH'
+    # everything else is disabled
+    - when: never
+
+test-job:
+  stage: test
+  image: python:3.11-slim
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends bash
+    - rm -rf /var/lib/apt/lists/*
+  script:
+    - bash scripts/check_markdown_validity.sh # invoked explicitly with Bash, so no executable permission is required
+  rules: # specify when to run or skip jobs
+  # merge request pipelines
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    changes:
+        - posts/en/**/*.md
+        - posts/template.md.tmpl
+        - scripts/check_markdown_validity.sh
+        - .gitlab-ci.yml
+  # normal branch pushes
+  - if: '$CI_COMMIT_BRANCH'
+    changes:
+        - posts/en/**/*.md
+        - posts/template.md.tmpl
+        - scripts/check_markdown_validity.sh
+        - .gitlab-ci.yml
+
+build-job:
+  stage: build
+  image:
+    name: docker:24.0.5-cli
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    # verify docker daemon and TLS connectivity
+    - docker info
+  script:
+    # build the image using the commit SHA as an immutable tag
+    - docker build
+      --pull
+      --tag "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+      .
+    # authenticate and publish the image only from the default branch (main)
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin 
+
+        docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+      fi
+  rules:
+    # merge request pipelines
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # normal branch pushes
+    - if: '$CI_COMMIT_BRANCH'
+
+deploy-job:
+  stage: deploy
+  needs: ["build-job"]
+  image:
+    name: docker:24.0.5-cli
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    # install Docker Compose plugin manually
+    - apk add --no-cache curl
+    - mkdir -p /root/.docker/cli-plugins
+    - curl -SL https://github.com/docker/compose/releases/download/v2.29.1/docker-compose-linux-x86_64 -o /root/.docker/cli-plugins/docker-compose
+    - chmod +x /root/.docker/cli-plugins/docker-compose
+    # verify Docker Compose installation
+    - docker compose version
+    # verify docker daemon and TLS connectivity
+    - docker info
+    # authenticate to the registry so that the image can be pulled from it
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u "$CI_REGISTRY_USER" --password-stdin 
+    # create the environment file required by Docker Compose
+    - |
+      cat > .env <<EOF
+      POSTGRES_USER=$POSTGRES_USER
+      POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      POSTGRES_DB=$POSTGRES_DB
+      DATABASE_URL=$DATABASE_URL
+      EOF
+  script:
+    # deploy exactly the image produced by build-job
+    - export TAG="$CI_COMMIT_SHA"
+    # verify the Compose configuration
+    - docker compose --profile prod config
+    # pull the image identified by the TAG from the registry
+    - docker compose --profile prod pull
+    # start/update the services in detached mode
+    - docker compose --profile prod up -d
+    # basic verification
+    - docker compose --profile prod ps
+    - curl -f http://localhost:8081/ || (docker compose --profile prod logs --tail=200 && exit 1)
+  environment:
+    name: production
+  rules:
+    # only deploy from the default branch (main)
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual

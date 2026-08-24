@@ -3,16 +3,16 @@ x-web-service: &default-web-service
     db:
       condition: service_healthy
       restart: true
-  # image is built locally from the Dockerfile(s)
-  build:
-    context: .
-    dockerfile: Dockerfile
 
 services:
   web-dev:
     <<: *default-web-service
     container_name: flask-dev
     profiles: ["dev"]
+    # image is built locally from the Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
     # load environment variables from a file
     env_file: ".env"
     # specific environment variables for this service (override the ones from the env_file)
@@ -33,6 +33,8 @@ services:
     <<: *default-web-service
     container_name: flask-prod
     profiles: ["prod"]
+    # image is pulled from the GitLab Container Registry
+    image: "${CI_REGISTRY_IMAGE}:${TAG}"
     # load environment variables from a file
     env_file: ".env"
     ports: # host:container
