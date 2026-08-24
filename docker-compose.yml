@@ -35,6 +35,7 @@ services:
     profiles: ["prod"]
     # image is pulled from the GitLab Container Registry
     image: "${CI_REGISTRY_IMAGE}:${TAG}"
+    restart: unless-stopped
     # load environment variables from a file
     env_file: ".env"
     ports: # host:container
@@ -46,6 +47,7 @@ services:
     profiles: ["dev", "prod"]
     # image is pulled from Docker Hub
     image: postgres:14
+    restart: unless-stopped
     # load environment variables from a file
     env_file: ".env"
     ports: # host:container
