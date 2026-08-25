@@ -50,9 +50,8 @@ services:
     restart: unless-stopped
     # load environment variables from a file
     env_file: ".env"
-    ports: # host:container
-      - "5432:5432" # unnecessary but useful for debugging:
-                    # web already has access to the db container through the default bridge network
+    # ports is unnecessary as the web services already has access to the db container through the default bridge network 
+    # and postgres doesn't need to be exposed to the host machine
     volumes:
       - db-data:/var/lib/postgresql/data/
     healthcheck:
@@ -65,3 +64,7 @@ services:
 volumes:
   db-data:
     name: flask-postgres-data
+
+# optional: the default network is created automatically if not specified
+networks:
+  default: # default driver will be 'bridge'
