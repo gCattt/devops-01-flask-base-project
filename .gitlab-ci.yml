@@ -126,19 +126,28 @@ deploy-job:
     # basic verification
     - docker compose --profile prod ps
     - |
-      echo "Waiting for application smoke test..."
+      echo "Waiting for web-prod to become healthy..."
 
       for i in $(seq 1 30); do
-        if curl -fsS http://localhost:8081/ > /dev/null; then
-          echo "Smoke test passed"
+        STATUS=$(docker inspect --format='{{.State.Health.Status}}' flask-prod 2>/dev/null || true)
+
+        echo "web-prod health: $STATUS"
+
+        if [ "$STATUS" = "healthy" ]; then
+          echo "Smoke test passed: web-prod is healthy"
           exit 0
         fi
 
-        echo "Application not ready yet ($i/30)"
+        if [ "$STATUS" = "unhealthy" ]; then
+          echo "Smoke test failed: web-prod is unhealthy"
+          docker compose --profile prod logs --tail=200
+          exit 1
+        fi
+
         sleep 2
       done
 
-      echo "Smoke test failed"
+      echo "Smoke test failed: timeout waiting for web-prod"
       docker compose --profile prod logs --tail=200
       exit 1
   environment:
