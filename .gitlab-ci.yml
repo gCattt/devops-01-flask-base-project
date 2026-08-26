@@ -125,7 +125,22 @@ deploy-job:
     - docker compose --profile prod up -d
     # basic verification
     - docker compose --profile prod ps
-    - curl -f http://localhost:8081/ || (docker compose --profile prod logs --tail=200 && exit 1)
+    - |
+      echo "Waiting for application smoke test..."
+
+      for i in $(seq 1 30); do
+        if curl -fsS http://localhost:8081/ > /dev/null; then
+          echo "Smoke test passed"
+          exit 0
+        fi
+
+        echo "Application not ready yet ($i/30)"
+        sleep 2
+      done
+
+      echo "Smoke test failed"
+      docker compose --profile prod logs --tail=200
+      exit 1
   environment:
     name: production
   rules:
