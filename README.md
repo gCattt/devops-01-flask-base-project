@@ -45,6 +45,7 @@ The production deployment is handled through GitLab CI/CD and triggered manually
 * PostgreSQL
 * Docker
 * Docker Compose
+* Bash
 * Gunicorn
 * GitLab CI/CD
 
